@@ -1,0 +1,8 @@
+Section a): 
+plot "Wins+Nom vs. Rating" shows that that more a movie got nominated and wins, the higher the rating.
+This relationship shows best when red circles vanishes with exceeding of nominations the 40.
+In second figure (Budget vs. Rating) red circle and blue crosses are scattered all over the figure.
+
+Section c)
+Square root scale can be used when a non-normal variable appear more like normal. (skewness in the variable)(it is usually use with counting problems)
+Logarithmic are usually used when the data is in large range of quantities. Usually when data has exponential (negative or positive) growth. 

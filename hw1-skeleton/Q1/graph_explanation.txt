@@ -1,0 +1,4 @@
+I used Fruchterman Reingold algorithm to organize the nodes.
+In this algorithm, nodes with more edges are in the middle and node with less edges (island) are gathered in the side. 
+I also managed to show nodes with larger edges with larger point diameter.
+Interestingly, the only handful of nodes managed to get more than 5 edges. This should not happen because we are only getting 5 similar nodes. Gephi is connecting some nodes because of option "create missing nodes".

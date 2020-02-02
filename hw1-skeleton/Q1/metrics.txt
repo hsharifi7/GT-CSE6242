@@ -1,0 +1,8 @@
+The average degree is the average number of links per node. 
+The average is 1.5 which means for every 3 nodes there are two vertices.
+This shows, based on my algorithm, most popular movies took the similar movies as direct edge. 
+
+The diameter is the length of the longest edge among all the shortest edges. Diameter is the max hops from one node to another. 
+
+The average length path is 1.6 and the max is 6. This means, at maximum, it take 6 hops to get from one node to another.
+Gephi calculates the average path length for "Network Diameter". 
