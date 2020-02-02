@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <style type="text/css">
+        .grid path {
+            stroke-width: 0;
+        }
+
+        @media print {
+            h2 {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script src="../lib/d3.v5.min.js"></script>
+    <script type="text/javascript">
+
+
+        var margin = { top: 20, right: 150, bottom: 40, left: 100 },
+            width = 960 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
+
+        var colorScale = d3.scaleOrdinal()
+            .domain(["0", "1"])
+            .range(["red", "blue"]);
+
+        //javascript is asyc. So we need to do all our drawing in one shot
+        //we will write funciton and call them when reading the data.
+        //http://tech4teaching.net/several-things-i-learned-when-using-d3-js-to-import-and-parse-csv-file/
+        sectionA = function (data, feature1, feature2, plotName, isSymboleScaled = false, sizedByFeature, isSqrtScale = false, isLogScale = false) {
+
+            var div = d3.selectAll("body")
+                .append("div");
+
+            // if you chain it with above, the div will go under h2 tag.
+            div.append("h2")
+                .text(plotName)
+
+            var featureScale = d3.scaleLinear()
+                .range([30, 200])
+                .domain(d3.extent(data, function (d) {
+                    return d[sizedByFeature];
+                }));
+
+
+            var xScale = d3.scaleLinear()
+                .range([0, width])
+                .domain([d3.min(data, function (d) {
+                    return d[feature2];
+                }) - .1, d3.max(data, function (d) {
+                    return d[feature2];
+                }) + .3]);
+
+            var yScale = d3.scaleLinear()
+                .range([height, 0])
+                .domain(d3.extent(data, function (d) {
+                    return d[feature1];
+                }));
+
+            if (isLogScale) {
+                yScale = d3.scaleLog().clamp(true)
+                    .range([height, 0])
+                    .domain([Math.exp(-1), d3.max(data, function (d) { //I wanted the domain start very small positive number.
+                        return d[feature1];
+                    })]).nice()
+                    //.domain(1e-1, 1e4)
+            }
+
+            if (isSqrtScale) {
+                yScale = d3.scaleSqrt()
+                    .range([height, 0])
+                    .domain(d3.extent(data, function (d) {
+                        return d[feature1];
+                    }));
+
+            }
+
+            var xAxis = d3.axisBottom(xScale);
+            var yAxis = d3.axisLeft(yScale);
+
+            var svg = div.append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            svg.append("g")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis)
+                .append("text")
+                .attr("fill", "currentColor")
+                .attr("x", width)
+                .attr("y", -10)
+                .attr("font-size", "15px")
+                .style("text-anchor", "end")
+                .text(feature2);
+
+            svg.append("g")
+                .call(yAxis)
+                .append("text")
+                .attr("fill", "currentColor")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0)
+                .attr("dy", ".9em")
+                .attr("font-size", "15px")
+                .style("text-anchor", "end")
+                .text(feature1);
+
+            // create the grid lines for x axis
+            svg.append("g")
+                .attr("class", "grid")
+                .attr("transform", "translate(0," + height + ")")
+                .style("stroke-dasharray", ("6,3"))
+                .style("stroke-opacity", ".1")
+                .call(d3.axisBottom(xScale)//.ticks(13)
+                    .tickSize(-height)
+                    .tickFormat("")
+                )
+
+            svg.append("g")
+                .attr("class", "grid")
+                .style("stroke-dasharray", ("6,3"))
+                .style("stroke-opacity", ".1")
+                .call(d3.axisLeft(yScale)//.ticks(13)
+                    .tickSize(-width)
+                    .tickFormat("")//.tickFormat(d3.format(".1f"))
+                )
+
+            svg.selectAll(".dot")
+                .data(data)
+                .enter()
+                .append("path")
+                //.attr("class", "dot")
+                .attr("d", function (d) {
+                    if (isSymboleScaled) {
+                        //console.log(featureScale(d[sizedByFeature]))
+                        if (d.IsGoodRating) return d3.symbol().type(d3.symbolCross).size(featureScale(d[sizedByFeature]))()
+                        else return d3.symbol().type(d3.symbolCircle).size(featureScale(d[sizedByFeature]))()
+                    } else {
+                        if (d.IsGoodRating) return d3.symbol().type(d3.symbolCross).size(30)()
+                        else return d3.symbol().type(d3.symbolCircle).size(30)()
+                    }
+                })
+                .attr("transform", function (d) {
+                    //console.log("translate(" + xScale(d[feature2]) + "," + (d[feature1]) + ")"); 
+                    //console.log("translate(" + xScale(d[feature2]) + "," + yScale(d[feature1]) + ")"); 
+                    return "translate(" + xScale(d[feature2]) + "," + yScale(d[feature1]) + ")";
+                })
+                .style("stroke", function (d) { return colorScale(d.IsGoodRating); })
+                .style("fill", "white");
+
+            var legend = svg.selectAll(".legend")
+                .data(colorScale.domain())
+                .enter().append("g")
+                .attr("class", "legend")
+                .attr("transform", function (d, i) { return "translate(0," + i * 15 + ")"; })
+
+            legend.append("text")
+                .attr("x", width + 130)
+                .attr("y", 0)
+                .attr("dy", ".35em")
+                .attr("font-size", "15px")
+                .style("text-anchor", "end")
+                .text(function (d) {
+                    if (d == 1)
+                        return "good rating";
+                    else return "bad rating";
+                });
+
+            legend.append("path")
+                .attr("d", function (d) {
+                    if (d == 1) return d3.symbol().type(d3.symbolCross).size(30)()
+                    else return d3.symbol().type(d3.symbolCircle).size(30)()
+                })
+                .attr("transform", "translate(" + (width + 35) + ", 0)")
+                .style("stroke", colorScale)
+                .style("fill", "white");
+
+        }
+
+
+
+        ///////////////////////////////////////////////////////////////
+
+        d3.csv("movies.csv", function (data) {
+            return {
+                WinsNoms: +data.WinsNoms,
+                IsGoodRating: +data.IsGoodRating,
+                Budget: +data.Budget,
+                Rating: +data.Rating,
+                Votes: +data.Votes
+            };
+
+
+        }).then(function (data) {
+            //console.log(data)
+            sectionA(data, 'WinsNoms', 'Rating', 'Wins+Nominations vs. Rating', false);
+            sectionA(data, 'Budget', 'Rating', 'Budget vs. Rating', false);
+            sectionA(data, 'Votes', 'Rating', 'Votes vs. Rating sized by Wins+Nominations', true, 'WinsNoms');
+            sectionA(data, 'WinsNoms', 'Rating', 'Wins+Nominations (square-root-scaled) vs. Rating', false, '', true);
+            sectionA(data, 'WinsNoms', 'Rating', 'Wins+Nominations (log-scaled) vs. Rating', false, '', false, true);
+        })
+
+    </script>
+</body>
+
+</html>

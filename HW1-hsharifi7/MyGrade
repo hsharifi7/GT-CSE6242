@@ -1,0 +1,9 @@
+Total: 89.5/100 || 
+
+Q1 (33/40): -4 Number of movies exceed 350; 0 ; 0 ; -2 No labels; -1 Diameter not mentioned; Good attempt || 
+
+Q2 (34.5/35) (e) [-0.5] output format is incorrect: cast_id,cast_name,movie_count || 
+
+Q3 (12/15): -2 random values returned in range [10, 250). Range was required to be [10, 250]; -1 Tic marks do not adjust automatically based on random points;  ;  ;  ;  ;  || 
+
+Q4 (10/10): 0 (Q4 - 1a) Good Job! Included the correct number of blank lines for category name column.; 0 (Q4 - 1b) Good Job! Included the correct number of columns for category name column split by separator.; 0 (Q4 - 2) Good Job! Included the correct number of clusters for the name column.; 0 (Q4 - 3) Good job! All blank rows have been replaced with Unbranded.;0 (Q4 - 4) Good job! High_priced column was created correctly.;0 (Q4 - 5) Good job! Has_offer column was created correctly.; 0  89.5

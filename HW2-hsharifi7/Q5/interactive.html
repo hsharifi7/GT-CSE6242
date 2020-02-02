@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <style type="text/css">
+        div.main {
+            margin: auto;
+            width: 1000px;
+        }
+
+        .main h1 {
+            text-align: center;
+        }
+
+        .bar rect {
+            fill: lightslategrey;
+        }
+
+        .bar text {
+            fill: white;
+            font-size: 14px;
+            text-anchor: start;
+        }
+
+        .yAxis path {
+            display: none;
+        }
+
+        .yAxis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+
+        .yAxis text {
+            font-size: 14px;
+            fill: gray;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: black;
+            shape-rendering: crispEdges;
+        }
+    </style>
+</head>
+
+<body>
+    <div class='main'>
+        <h2 align="center"> Polupation Growth %=(Change in Population / Previous Year Population) * 100 </h1>
+    </div>
+
+    <script src="../lib/d3.v5.min.js"></script>
+    <script type="text/javascript">
+
+        //golobal varialbe data
+        var data = [{ country: 'Bangladesh', population_2012: 105905297, growth: { year_2013: 42488, year_2014: 934, year_2015: 52633, year_2016: 112822, year_2017: 160792 } },
+        { country: 'Ethopia', population_2012: 75656319, growth: { year_2013: 1606010, year_2014: 1606705, year_2015: 1600666, year_2016: 1590077, year_2017: 1580805 } },
+        { country: 'Kenya', population_2012: 33007327, growth: { year_2013: 705153, year_2014: 703994, year_2015: 699906, year_2016: 694295, year_2017: 687910 } },
+        { country: 'Afghanistan', population_2012: 23280573, growth: { year_2013: 717151, year_2014: 706082, year_2015: 665025, year_2016: 616262, year_2017: 573643 } },
+        { country: 'Morocco', population_2012: 13619520, growth: { year_2013: 11862, year_2014: 7997, year_2015: 391, year_2016: -8820, year_2017: -17029 } }];
+
+        var margin = { top: 20, right: 280, bottom: 300, left: 130 },
+            width = 1080 - margin.left - margin.right,
+            height = 550 - margin.top - margin.bottom;
+
+        var format = data.map(function (record) {
+            var total = record.population_2012 +
+                record.growth.year_2013 +
+                record.growth.year_2014 +
+                record.growth.year_2015 +
+                record.growth.year_2016 +
+                record.growth.year_2017;
+
+            var growthPercent = [100 * record.growth.year_2013 / record.population_2012,
+            100 * record.growth.year_2014 / (record.population_2012 + record.growth.year_2013),
+            100 * record.growth.year_2015 / (record.population_2012 + record.growth.year_2013 + record.growth.year_2014),
+            100 * record.growth.year_2016 / (record.population_2012 + record.growth.year_2013 + record.growth.year_2014 + record.growth.year_2015),
+            100 * record.growth.year_2017 / (record.population_2012 + record.growth.year_2013 + record.growth.year_2014 + record.growth.year_2015 + record.growth.year_2016)]
+
+            return {
+                name: record.country,
+                growthPercent: d3.zip(["2013", "2014", "2015", "2016", "2017"], growthPercent),
+                total: total
+            }
+        });
+
+        //console.log(format)
+
+        var svg = d3.selectAll(".main").append("svg")
+            .attr("height", height + margin.top + margin.bottom)
+            .attr("width", width + margin.left + margin.right)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        var xBarChartScale = d3.scaleLinear()
+            .range([0, width])
+            .domain([0, d3.max(format, function (d) {
+                return d.total;
+            })])
+            .nice();
+
+        var yBarchartScale = d3.scaleBand()
+            .rangeRound([0, height])
+            .paddingInner(0.5)
+            .domain(format.map(function (d) {
+                return d.name;
+            }));
+
+        var yAxis = d3.axisLeft()
+            .scale(yBarchartScale)
+            .tickSize(0)
+            .tickPadding(5);
+
+        var bar = svg.selectAll(".bar")
+            .data(format)
+            .enter().append("g")
+            .attr("class", "bar")
+            .attr("transform", function (d) {
+                return "translate(0," + yBarchartScale(d.name) + ")";
+            });
+
+        bar.append("rect")
+            .attr("width", function (d) { return xBarChartScale(d.total); })
+            .attr("height", yBarchartScale.bandwidth())
+            .on("mouseover", showLegend)
+            .on("mouseout", offLegend);
+
+        bar.append("text")
+            .attr("x", 10)
+            .attr("height", yBarchartScale.bandwidth())
+            .attr("y", yBarchartScale.bandwidth() * 0.5)
+            .attr("dy", ".35em")
+            .text(function (d) {
+                return d.total.toLocaleString('en');
+            })
+            .on("mouseover", showLegend)
+            .on("mouseout", offLegend);;
+
+        svg.append("g")
+            .attr("class", "yAxis")
+            .call(yAxis);
+
+        var legend = svg.append("g")
+            .attr("transform", "translate(" + (width + 30) + ", " + (height - 350) + ")")
+            .attr("class", ".legend");
+
+
+        function showLegend(data) {
+            //console.log(data)
+            d3.selectAll(".lchart").remove();
+            d3.select(this.parentNode.children[0]).style("fill", "teal");
+
+            var lchart = svg.append("svg")
+                .attr("class", "lchart")
+                .attr("height", height + margin.top + margin.bottom)
+                .attr("width", width + margin.left + margin.right)
+                .append("g")
+                .attr("transform", "translate(700,15)");
+
+            var x2 = d3.scaleLinear().domain([2013, 2017]).range([0, 150]);
+            var y2 = d3.scaleLinear().domain([d3.min(data.growthPercent, function (d) {
+                return d[1];
+            }), d3.max(data.growthPercent, function (d) { return d[1]; })])
+                .range([120, 0]);
+
+            var xAxis = d3.axisBottom(x2)
+                .ticks(4)
+                .tickFormat(d3.format("d"));
+
+            var yAxis = d3.axisLeft(y2)
+                .ticks(6);
+
+            lchart.append("g")
+                .attr("class", "axis")
+                .attr("transform", "translate(0, 120)")
+                .call(xAxis)
+                .append("text")
+                .attr("y", 20)
+                .attr("x", 160)
+                .attr("dy", ".9em")
+                .attr("font-size", "12px")
+                .style("text-anchor", "end")
+                .attr("fill", "currentColor")
+                .text("Year");
+
+
+
+            lchart.append("g")
+                .attr("class", "axis")
+                .call(yAxis)
+                .append("text")
+                .attr("y", -15)
+                .attr("x", 0)
+                .attr("dy", ".9em")
+                .attr("font-size", "12px")
+                .style("text-anchor", "end")
+                .attr("fill", "currentColor")
+                .text("Pct %");
+
+            var line = d3.line()
+                .x(function (d) {
+                    return x2(d[0]);
+                })
+                .y(function (d) {
+                    return y2(d[1]);
+                });
+
+            lchart.append("path")
+                .attr("d", line(data.growthPercent))
+                .style("stroke", "teal")
+                .style("stroke-width", 2)
+                .style("fill", "none");
+        };
+
+        function offLegend() {
+            d3.selectAll(".lchart").remove();
+            d3.select(this.parentNode.children[0]).style("fill", "lightslategrey");
+            //console.log(d3.select(this.parentNode))
+        }
+
+
+    </script>
+</body>
+
+</html>

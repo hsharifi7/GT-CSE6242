@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <style type="text/css">
+        rect.border {
+            stroke: black;
+            stroke-width: 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 align="center"> Visualizing Crimes in New York City </h1>
+    <div id="sellectbox" align="center">
+        Year
+    </div>
+    <div id="chart" align="center"></div>
+    <script src="../lib/d3.v5.min.js"></script>
+    <script type="text/javascript">
+
+        //golobal varialbe data
+        var data;
+        var selectValue = 2011;
+
+        var margin = { top: 20, right: 100, bottom: 100, left: 100 },
+            width = 760 - margin.left - margin.right,
+            height = 600 - margin.top - margin.bottom;
+
+        var cubeSize = 50;
+
+        var colors = ["#fff7f3", "#fde0dd", "#fcc5c0", "#fa9fb5", "#f768a1", "#dd3497", "#ae017e", "#7a0177", "#49006a"],
+            Borough = ["Bronx", "Brooklyn", "Manhatan", "Queens", "Staten Island"],
+            crimeType = ["Assault", "Burglary", "Housing", "Murder", "Robbery", "Shooting"],
+            years = ["2011", "2012", "2013", "2014", "2015"]
+
+
+        var select = d3.select('#sellectbox')
+            .append('select')
+            .attr('class', 'select')
+            .on('change', selectOption);
+
+        var options = select.selectAll('option')
+            .data(years).enter()
+            .append('option')
+            .text(function (d) { return d; })
+
+        var svg = d3.selectAll("#chart")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        svg.selectAll(".yLabel")
+            .data(Borough)
+            .enter()
+            .append("text")
+            .attr("x", 100)
+            .attr("y", function (d, i) { return 50 + i * 50; })
+            .text(function (d) { return d; })
+            .style("text-anchor", "end")
+            .attr("transform", "translate(-6," + cubeSize / 1.5 + ")")
+
+        svg.append("g")
+            .append("text")
+            .attr("x", 100)
+            .attr("y", 0)
+            .style('font-weight', 'bold')
+            .style('fill', 'black')
+            .text("Borough")
+            .style("text-anchor", "end")
+            .style("font-size", "15px")
+            .attr("transform", "translate(-6," + cubeSize / 1.5 + ")");
+
+        //https://stackoverflow.com/questions/11252753/rotate-x-axis-text-in-d3
+        svg.selectAll(".xLabel")
+            .data(crimeType)
+            .enter().append("text")
+            .text(function (d) { return d; })
+            .attr("x", function (d, i) { return 120 + i * cubeSize; })
+            .attr("y", 50 + cubeSize * 6.5)
+            .style("text-anchor", "middle")
+            .attr("transform", function (d, i) {
+                var x = 110 + i * cubeSize;
+                var y = 30 + cubeSize * 6.5
+                return "rotate(-90," + x + "," + y + ")"
+            })
+
+        svg.append("g")
+            .append("text")
+            .attr("x", 6 * cubeSize + 150)
+            .attr("y", 30 + cubeSize * 6.5)
+            .style('fill', 'black')
+            .style('font-weight', 'bold')
+            .style("font-size", "15px")
+            .text("Crime Type")
+            .style("text-anchor", "end")
+            .attr("transform", "translate(25, -6)");
+
+        svg.append("g")
+            .append("text")
+            .attr("x", 90)
+            .attr("y", 440)
+            .text("No of Crimes")
+            .style("font-size", "18px");
+
+        var legend = svg.selectAll(".legend")
+            .data(colors)
+            .enter()
+            .append("rect")
+            .attr("width", 50)
+            .attr("height", 25)
+            .attr("x", function (d, i) {
+                return 90 + cubeSize * i;
+            })
+            .attr("y", 450)
+            .attr("stroke", "black")
+            .style("fill", function (d) { return d; });
+
+
+        function selectOption() {
+            selectValue = d3.select('select').property('value');
+            //console.log(selectValue)
+            //console.log(data)
+            callme(data, selectValue)
+        }
+
+        function callme(data, selectValue) {
+            var boroghs = [];
+            var crimes = [];
+
+
+            var dataByYear = []
+            for (var i = 0; i < 5; i++) {
+                var temp = [];
+                for (var j = 0; j < 6; j++) {
+                    temp.push(data[i * 6 + j])
+                }
+                temp.sort(function (a, b) {
+                    return d3.ascending(a.CrimeType, b.CrimeType)
+                })
+                dataByYear.push(temp);
+            }
+
+            //console.log(dataByYear)
+
+            var temp1 = [];
+            for (var i = 0; i < 5; i++) {
+                var temp = [];
+                for (var j = 0; j < 6; j++) {
+                    temp.push(dataByYear[i][j].Bronx);
+                }
+                for (var j = 0; j < 6; j++) {
+                    temp.push(dataByYear[i][j].Brooklyn);
+                }
+                for (var j = 0; j < 6; j++) {
+                    temp.push(dataByYear[i][j].Manhattan);
+                }
+                for (var j = 0; j < 6; j++) {
+                    temp.push(dataByYear[i][j].Queens);
+                }
+                for (var j = 0; j < 6; j++) {
+                    temp.push(dataByYear[i][j].StatenIsland);
+                }
+                temp1.push(temp)
+            }
+
+            dataByYear = temp1
+            //console.log(dataByYear)
+
+            var colorScale = d3.scaleQuantile()
+                .domain(d3.extent(dataByYear[parseInt(selectValue) - 2011], function (d) {
+                    return d;
+                }))
+                .range(colors);
+
+            // console.log(d3.extent(dataByYear[parseInt(selectValue) - 2011], function (d) {
+            //         return d;
+            //     }))
+
+            svg.selectAll(".crimes").remove();
+            svg.selectAll(".test").remove();
+
+            svg.selectAll(".crimes")
+                .data(dataByYear[parseInt(selectValue) - 2011])
+                .enter()
+                .append("rect")
+                .attr("class", "border")
+                .attr("width", cubeSize)
+                .attr("height", cubeSize)
+                .attr("x", function (d, i) { return 100 + (i % 6) * cubeSize; })
+                .attr("y", function (d, i) { return 50 + parseInt(i / 6) * cubeSize; })
+
+                .style("fill", function (d) { return colorScale(d); });
+
+
+            var cramieScale = d3.scaleLinear()
+                .domain([0, d3.max(colorScale.quantiles())])
+                .range(d3.extent(dataByYear[parseInt(selectValue) - 2011], function (d) {
+                    return d;
+                }));
+
+            //console.log(cramieScale(8.88888888888889))
+            //console.log([0, d3.max(colorScale.quantiles())])
+            // console.log(d3.extent(dataByYear[parseInt(selectValue) - 2011], function (d) {
+            //     return d;
+            // }))
+
+            svg.selectAll(".NoCrimes")
+                .data(function () {
+                    var temp = colorScale.quantiles()
+                    temp.unshift(0);
+                    //console.log(temp)
+                    return temp;
+
+                })
+                .enter()
+                .append("text")
+                .attr("class", "test")
+                .text(function (d) {
+                    //console.log(Math.round(d).toString())
+                    //console.log(cramieScale(d))
+                    return Math.round(cramieScale(d));
+                })
+                .attr("x", function (d, i) {
+                    return 90 + cubeSize * i;
+                })
+                .attr("y", 490);
+
+        }
+        ///////////////////////////////////////////////////////////////
+
+        d3.csv("heatmap.csv", function (data) {
+            return {
+                Bronx: +data.Bronx,
+                Brooklyn: +data.Brooklyn,
+                Manhattan: +data.Manhattan,
+                Queens: +data.Queens,
+                StatenIsland: +data["Staten Island"],
+                CrimeType: data["Crime Type"],
+                Year: data["Year"]
+            };
+
+
+        }).then(function (data) {
+            //console.log(data);
+            self.data = data;
+            callme(data, 2011);
+        })
+    </script>
+</body>
+
+</html>

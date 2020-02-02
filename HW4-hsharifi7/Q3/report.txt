@@ -1,0 +1,71 @@
+###############################################################################
+##                                                                           ##
+##  IMPORTANT NOTE: All accuracies must be reported with two decimal places  ##
+##  in the range of [0.00, 1.00], e.g. 0.78 and not 78, 78.00, 78%, etc.     ##
+##                                                                           ##
+###############################################################################
+
+**********************************************
+Q 3.1
+
+Linear Regression - Training Accuracy: 0.64
+Linear Regression - Testing Accuracy: 0.64
+
+Random Forest - Training Accuracy: 0.65
+Random Forest - Testing Accuracy: 0.65
+
+SVM - Training Accuracy: 0.55
+SVM - Testing Accuracy: 0.54
+
+**********************************************
+
+Q 3.2 Hyperparameter Tuning
+
+Random Forest - n_estimators values tested (at least 3): 100, 125, 150
+Random Forest - max_depth values tested (at least 3): 2, 4, 6
+
+Random Forest - Best combination of parameter values - n_estimators: 150
+Random Forest - Best combination of parameter values - max_depth: 6
+
+Random Forest - Testing Accuracy before tuning (default parameters): 0.65
+Random Forest - Testing Accuracy after tuning: 0.78
+
+SVM - Kernel Values tested: linear, rbf
+SVM - C values tested (at Least 3): 0.0001, 0.001, 0.01
+SVM - Best combination of parameter values - Kernel: linear
+SVM - Best combination of parameter values - C: 0.0001
+
+SVM - Testing Accuracy before tuning (default parameters): 0.54
+SVM - Testing Accuracy after tuning: 0.55
+
+*********************************************
+
+Q 3.3
+
+SVM - Highest mean testing/cross-validated accuracy (best score): 0.55
+SVM - Mean train score: 0.55
+SVM Mean fit time: 4.43
+
+*********************************************
+
+Q 3.4 Feature Importance - WITH THE MODEL TRAINED IN Q 3.1
+
+Random Forest  - Most important feature (e.g. X5): X7
+Random Forest  - Least important feature (e.g. X1): X3
+
+*********************************************
+
+Q 3.5
+
+Best Classifier and why (in at most 50 words): 
+The best classifier was the random forest. After tuning, the accuracy was 78%.
+And it was not that slow compared to others such as SVM.
+
+*********************************************
+
+Q 3.6 Principal Component Analysis
+
+"PCA - Percentage of variance explained by each of the selected components (enter the entire array as [0.12, …, 0.012])": [0.57, 0.43, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00]
+"PCA - Singular values corresponding to each of the selected components (enter the entire array as [0.09, …, 0.037])": [886657.01, 765862.84, 6543.8,  3529.16, 3108.13, 1436.16, 1383.13, 1041.18, 962.81, 918.42]
+
+*********************************************

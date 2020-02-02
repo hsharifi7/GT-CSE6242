@@ -1,0 +1,8 @@
+i.a 47
+i.b 5
+ii. 566
+iii. if(isNull(value), "Unbranded", value)
+iv. if(value>100, 1, 0)
+v. if( or(contains(value,"discount"), contains(value,"offer"), contains(value,"sale")), 1, 0)
+
+

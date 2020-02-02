@@ -1,0 +1,25 @@
+
+1. Ease to develop:
+	Excel: easy to use and easy for developers and non-developers.
+	Tableau: moderately easy to learn for developers and non-developers. But you have to stick with tools rules
+	D3: steep ramp up but very flexible and powerful. It has a lot of online resources.
+
+2. Ease to maintain
+	Excel: Microsoft does good job in backward compatibility. very easy to maintain.
+	Tableau: Similar to Excel. Nevertheless, different versions may not be compatible (desktop vs server)
+	D3: It is not backward compatible so there is a need for constant maintenance. 
+
+3. Usability
+	Excel: Easy to use and popular among business employees and managers.
+	Tableau: harder than excel but yet you can quickly come up with charts and figures. 
+	D3: The hardest.  You have to know how to use javascript to use D3.
+
+4. Scalability
+	Excel: Performs well with scaling data. It not as stable with very large data. 
+	Tableau: Well optimized for large data. Tableau claims that it performs as good as databases.
+	D3: Scalability is not built in D3. Developers has to design big data design themselves.
+
+5. System requirements
+	Excel: License is needed. It only runs on Mac and Windows. No high-end HW needed.
+	Tableau: License is needed. The server version need high-end HW.
+	D3: It is Free and supports any device (laptop to phone).
